@@ -16,7 +16,8 @@ app.use(express.json());
 
 // TODO: Middleware
 
-// TODO: Connect DB
+// Connect DB
+const connectDB = require('./db/connect');
 
 // Routers
 const authRouter = require('./routes/auth');
@@ -42,6 +43,17 @@ app.get("/*splat", (req, res) => {
 });
 
 // Start App
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+const start = async () => {
+    try {
+        await connectDB(process.env.MONGO_URI);
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+start();
+
+
