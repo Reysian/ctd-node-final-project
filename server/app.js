@@ -14,7 +14,9 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 
-// TODO: Middleware
+// Middleware
+const errorHandlerMiddleware = require('./middleware/error-handler');
+const authUser = require('./middleware/auth');
 
 // Connect DB
 const connectDB = require('./db/connect');
@@ -25,7 +27,7 @@ const transactionRouter = require('./routes/transactions');
 
 // API routes
 app.use('/api/auth', authRouter);
-app.use('/api/transactions', transactionRouter);
+app.use('/api/transactions', authUser, transactionRouter);
 
 app.get("/api", (req, res) => {
   res.status(200).json({ message: "Hello from server!" });
@@ -35,6 +37,9 @@ app.get("/api", (req, res) => {
 app.use("/api", (req, res) => {
   res.status(404).json({ error: "Data not found" });
 });
+
+// Error handler(s)
+app.use(errorHandlerMiddleware);
 
 // Deployment
 app.use(express.static(path.join(__dirname, "../client/dist")));

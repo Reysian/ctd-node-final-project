@@ -1,24 +1,24 @@
 const express = require("express");
 const router = express.Router();
+const {
+  getAllTransactions,
+  getTransaction,
+  createTransaction,
+  editTransaction,
+  deleteTransaction,
+  submitTransaction,
+} = require('../controllers/transactions');
 
-router.get("/", (req, res) => {
-  res.status(200).json({ message: "Get all transactions" });
-});
+router.get("/", getAllTransactions);
 
-router.get("/:id", (req, res) => {
-  res.status(200).json({ message: `Get transaction ${req.params.id}` });
-});
+router.get("/:id", getTransaction);
 
-router.post("/", (req, res) => {
-  res.status(201).json({ message: "Add transaction" });
-});
+router.post("/", createTransaction);
 
-router.patch("/:id", (req, res) => {
-  res.status(201).json({ message: `Update transaction ${req.params.id}` });
-});
+router.patch("/:id", editTransaction);
 
-router.delete("/:id", (req, res) => {
-  res.status(201).json({ message: `Delete transaction ${req.params.id}` });
-});
+router.delete("/:id", deleteTransaction);
+
+router.post("/:id", submitTransaction);
 
 module.exports = router;

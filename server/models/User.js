@@ -17,11 +17,15 @@ const UserSchema = new mongoose.Schema({
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             'user email required',
         ],
-        unique: true,
+        unique: [true, 'email already in use'],
     },
     password: {
         type: String,
         required: [true, 'user password required'],
+    },
+    balance: {
+        type: Number,
+        default: 0
     },
 });
 
