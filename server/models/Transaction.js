@@ -11,6 +11,9 @@ const TransactionSchema = new mongoose.Schema({
         ref: 'User',
         default: null,
     },
+    recipientEmail: {
+        type: String,
+    },
     typeOf: {
         type: String,
         enum: ['deposit', 'withdrawal', 'transfer'],

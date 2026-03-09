@@ -8,6 +8,14 @@ const getAllTransactions = async (req, res) => {
   res.status(200).json({ count: transactions.length, transactions });
 };
 
+const getUserInfo = async (req, res) => {
+  const user = await User.findOne({_id: req.user.userID});
+  if (!user) {
+    throw new Error(`No user with id=${req.params.id}`);
+  }
+  res.status(200).json({ user });
+}
+
 const getTransaction = async (req, res) => {
   const tID = req.params.id;
   const { name, userID } = req.user;
@@ -25,6 +33,7 @@ const createTransaction = async (req, res) => {
   const createdBy = req.user.userID;
   const { typeOf, amount, recipient_email } = req.body;
   let recipient = null;
+  let recipientEmail = null;
 
   // Get recipient's user ID if recipient email is included
   if (typeOf === "transfer") {
@@ -36,6 +45,7 @@ const createTransaction = async (req, res) => {
     });
     if (recipientObject) {
       recipient = recipientObject._id;
+      recipientEmail = recipientObject.email;
     } else {
       throw Error("Recipient email invalid");
     }
@@ -44,6 +54,7 @@ const createTransaction = async (req, res) => {
   const transactionJSON = {
     createdBy,
     recipient,
+    recipientEmail,
     typeOf,
     amount,
   };
@@ -57,6 +68,7 @@ const editTransaction = async (req, res) => {
   const createdBy = req.user.userID;
   const { typeOf, amount, recipient_email } = req.body;
   let recipient = null;
+  let recipientEmail = null;
 
   // Get recipient's user ID if recipient email is included
   if (typeOf === "transfer") {
@@ -68,6 +80,7 @@ const editTransaction = async (req, res) => {
     });
     if (recipientObject) {
       recipient = recipientObject._id;
+      recipientEmail = recipientObject.email;
     } else {
       throw Error("Recipient email invalid");
     }
@@ -76,6 +89,7 @@ const editTransaction = async (req, res) => {
   const transactionJSON = {
     createdBy,
     recipient,
+    recipientEmail,
     typeOf,
     amount,
   };
@@ -185,6 +199,7 @@ const submitTransaction = async (req, res) => {
 
 module.exports = {
   getAllTransactions,
+  getUserInfo,
   getTransaction,
   createTransaction,
   editTransaction,

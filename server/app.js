@@ -6,11 +6,11 @@ const PORT = process.env.PORT || 5000;
 
 // Extra security
 const cors = require("cors");
-const xss = require("xss-clean");
+const { xss } = require("express-xss-sanitizer"); // xss-clean is depreciated. This is the best alternative I could find.
 const helmet = require("helmet");
 
 app.use(cors());
-//app.use(xss()); Depreciated in express 5. Ask mentor.
+app.use(xss());
 app.use(helmet());
 app.use(express.json());
 

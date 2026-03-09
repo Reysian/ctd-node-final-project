@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   getAllTransactions,
+  getUserInfo,
   getTransaction,
   createTransaction,
   editTransaction,
@@ -10,6 +11,8 @@ const {
 } = require('../controllers/transactions');
 
 router.get("/", getAllTransactions);
+
+router.get("/user", getUserInfo)
 
 router.get("/:id", getTransaction);
 
