@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
-import { Router, Routes, Route } from "react-router";
+import { useState } from "react";
+import { Routes, Route } from "react-router";
 import "./App.css";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./pages/ProtectedRoute"
-import TransactionForm from "./shared/TransactionForm";
-import TransactionListItem from "./TransactionListItem";
 import AppContext from "./shared/AppContext";
 
 function App() {
@@ -15,7 +14,7 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/dashboard" element={
+        <Route path="/" element={
           <AppContext.Provider value={{
             errorMessage,
             setErrorMessage
@@ -41,6 +40,7 @@ function App() {
             <Register />
           </AppContext.Provider>
         }/>
+        <Route path="/*" element={<NotFoundPage />} />
       </Routes>
     </>
   );

@@ -2,7 +2,7 @@ import { useRef, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router";
 import AppContext from "../shared/AppContext";
 
-
+// Login component creates a login page for existing users to access their user account on the dashboard
 function Login() {
   const emailInput = useRef(document.querySelector("#email"));
   const passwordInput = useRef(document.querySelector("#password"));
@@ -21,11 +21,11 @@ function Login() {
     console.log(payload);
 
     const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     };
 
     console.log(options);
@@ -44,14 +44,14 @@ function Login() {
       console.log(error);
       setErrorMessage(respData.error);
     }
-  }
+  };
 
   const handleLogin = async (event) => {
     event.preventDefault();
     const newToken = await login(event);
     if (newToken) {
       localStorage.setItem("token", newToken);
-      navigate("/dashboard");
+      navigate("/");
     }
   };
 
@@ -72,7 +72,7 @@ function Login() {
         <input
           id="password"
           ref={passwordInput}
-          type="text"
+          type="password"
           value={workingPassword}
           onChange={(event) => setWorkingPassword(event.target.value)}
         ></input>

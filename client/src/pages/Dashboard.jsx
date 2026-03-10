@@ -1,18 +1,16 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router";
-import reactLogo from "../assets/react.svg";
-import viteLogo from "/vite.svg";
 import "../App.css";
 import TransactionForm from "../shared/TransactionForm";
 import TransactionListItem from "../TransactionListItem";
 import AppContext from "../shared/AppContext";
 
+// Dashboard component creates the main page for logged-in users to view and interact with pending transactions on their account
 function Dashboard() {
   const [transactions, setTransactions] = useState([{}]);
   const [filteredTransactions, setFilteredTransactions] = useState([{}]);
   const [username, setUsername] = useState("");
   const [balance, setBalance] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedTransaction, setEditedTransaction] = useState({});
   const { errorMessage, setErrorMessage } = useContext(AppContext);
@@ -44,11 +42,13 @@ function Dashboard() {
     }
   };
 
+  // Log out a user
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
+  // Get all transactions assigned to the current user and store them in a list
   const loadTransactions = async () => {
     const token = localStorage.getItem("token");
     const options = {
@@ -61,25 +61,24 @@ function Dashboard() {
     let respData = null;
 
     try {
-      const resp = await fetch('/api/transactions', options);
+      const resp = await fetch("/api/transactions", options);
       respData = await resp.json();
       if (!resp.ok) {
         throw new Error(resp.error);
       }
-      
-      const fetchedTransactions = respData.transactions.map(
-        (transaction) => {
-          const currentTransaction = {
-            ...transaction,
-          };
-          return currentTransaction;
-        },
-      );
-      setTransactions(fetchedTransactions);
-      
-      const filtered = fetchedTransactions.filter((transaction) => (!transaction.submitted));
-      setFilteredTransactions(filtered);
 
+      const fetchedTransactions = respData.transactions.map((transaction) => {
+        const currentTransaction = {
+          ...transaction,
+        };
+        return currentTransaction;
+      });
+      setTransactions(fetchedTransactions);
+
+      const filtered = fetchedTransactions.filter(
+        (transaction) => !transaction.submitted,
+      );
+      setFilteredTransactions(filtered);
     } catch (error) {
       setErrorMessage(respData.error);
       console.log(error);
@@ -88,6 +87,7 @@ function Dashboard() {
     }
   };
 
+  // Add a transaction and update the user's list of transactions
   const addTransaction = async (typeOf, amount, recipient) => {
     const token = localStorage.getItem("token");
     const payload = {
@@ -115,15 +115,17 @@ function Dashboard() {
       if (!resp.ok) {
         throw new Error(resp.error);
       }
+      setErrorMessage("");
     } catch (error) {
       console.log(error);
       setErrorMessage(respData.error);
     }
 
     loadTransactions();
-    getUserInfo()
+    getUserInfo();
   };
 
+  // Edit a transaction and update the user's list of transactions
   const editTransaction = async (transaction, typeOf, amount, recipient) => {
     const token = localStorage.getItem("token");
     const payload = {
@@ -151,6 +153,7 @@ function Dashboard() {
       if (!resp.ok) {
         throw new Error(resp.error);
       }
+      setErrorMessage("");
     } catch (error) {
       console.log(error);
       setErrorMessage(respData.error);
@@ -164,6 +167,7 @@ function Dashboard() {
     getUserInfo();
   };
 
+  // Delete a transaction and update the user's list of transactions
   const deleteTransaction = async (transaction) => {
     const token = localStorage.getItem("token");
     const options = {
@@ -181,6 +185,7 @@ function Dashboard() {
       if (!resp.ok) {
         throw new Error(resp.error);
       }
+      setErrorMessage("");
     } catch (error) {
       console.log(error);
       setErrorMessage(respData.error);
@@ -192,6 +197,7 @@ function Dashboard() {
     getUserInfo();
   };
 
+  // Submit a transaction (apply the amount to the user's account), and update the user's list of transactions
   const submitTransaction = async (transaction) => {
     const token = localStorage.getItem("token");
     const options = {
@@ -209,6 +215,7 @@ function Dashboard() {
       if (!resp.ok) {
         throw new Error(resp.error);
       }
+      setErrorMessage("");
     } catch (error) {
       console.log(error);
       setErrorMessage(respData.error);
@@ -221,33 +228,24 @@ function Dashboard() {
   };
 
   useEffect(() => {
-      setIsLoading(true);
-      getUserInfo();
-      loadTransactions();
-      setIsLoading(false);
-    }, []);
+    getUserInfo();
+    loadTransactions();
+  }, []);
 
+  // Open the edit form when a transaction is being edited
   const handleEdit = (transaction) => {
     setEditedTransaction(transaction);
     setIsEditing(true);
-  }
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
       <h1>Faux Financial</h1>
       <h3>
-        Welcome {username}. Your balance is ${balance}
+        Welcome {username}. Your balance is ${Number(balance).toFixed(2)}
       </h3>
       <a onClick={() => handleLogout()}>Logout</a>
-      <p>{errorMessage}</p>
+      <p style={{ color: "pink" }}>{errorMessage}</p>
       <TransactionForm submitTransaction={addTransaction}>Add</TransactionForm>
       {isEditing && (
         <TransactionForm
@@ -256,9 +254,19 @@ function Dashboard() {
           recipient={editedTransaction.recipientEmail}
           transaction={editedTransaction}
           submitTransaction={editTransaction}
-        >Edit</TransactionForm>
+        >
+          Edit
+        </TransactionForm>
       )}
-      <table>
+      <h3>Pending Transactions:</h3>
+      <table style={{ fontWeight: "500" }}>
+        <thead>
+          <tr>
+            <th style={{ padding: "1rem" }}>Type of Transaction</th>
+            <th style={{ padding: "1rem" }}>Transaction Amount</th>
+            <th style={{ padding: "1rem" }}>Recipient Email (if applicable)</th>
+          </tr>
+        </thead>
         <tbody>
           {filteredTransactions.map((transaction) => (
             <TransactionListItem

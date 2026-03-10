@@ -2,6 +2,7 @@ import { useRef, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router";
 import AppContext from "../shared/AppContext";
 
+// Register component creates a register page for new users to create a user account and access the dashboard
 function Register() {
   const usernameInput = useRef(document.querySelector("#username"));
   const emailInput = useRef(document.querySelector("#email"));
@@ -53,7 +54,7 @@ function Register() {
     const newToken = await register(event);
     if (newToken) {
       localStorage.setItem("token", newToken);
-      navigate("/dashboard");
+      navigate("/");
     }
   };
 
@@ -86,7 +87,7 @@ function Register() {
           value={workingPassword}
           onChange={(event) => setWorkingPassword(event.target.value)}
         ></input>
-        <button onSubmit={(event) => handleRegister(event)}>Login</button>
+        <button onSubmit={(event) => handleRegister(event)}>Register</button>
       </form>
       <Link to={"/login"}>Login</Link>
     </>

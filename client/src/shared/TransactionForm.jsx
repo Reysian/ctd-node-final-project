@@ -1,12 +1,13 @@
 import { useRef, useState } from "react";
 
+// TransactionForm component creates a form for adding/editing transactions
 function TransactionForm({
   typeOf = "",
   amount = "",
   recipient = "",
   transaction,
   submitTransaction,
-  children
+  children,
 }) {
   const typeOfInput = useRef(document.querySelector("#typeOf"));
   const amountInput = useRef(document.querySelector("#amount"));
@@ -19,11 +20,19 @@ function TransactionForm({
   const handleSubmit = (event) => {
     event.preventDefault();
     if (transaction) {
-      submitTransaction(transaction, workingTypeOf, Number(workingAmount), workingRecipient);
+      submitTransaction(
+        transaction,
+        workingTypeOf,
+        Number(workingAmount).toFixed(2),
+        workingRecipient,
+      );
     } else {
-      submitTransaction(workingTypeOf, Number(workingAmount), workingRecipient);
+      submitTransaction(
+        workingTypeOf,
+        workingAmount,
+        workingRecipient,
+      );
     }
-    
   };
 
   return (

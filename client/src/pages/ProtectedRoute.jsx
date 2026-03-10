@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router";
+import { Navigate } from "react-router";
 
+// ProtectedRoute component verifies that a valid user is logged in before allowing access to child components
 function ProtectedRoute({ children }) {
   const [isValidating, setIsValidating] = useState(true);
   const [authorized, setAuthorized] = useState(null);
@@ -26,7 +27,6 @@ function ProtectedRoute({ children }) {
           throw new Error(resp.message);
         }
         setAuthorized(true);
-        
       } catch (error) {
         console.log(error);
       } finally {
@@ -38,7 +38,7 @@ function ProtectedRoute({ children }) {
   }, []);
 
   if (!isValidating && !authorized) {
-    return <Navigate to="/login"/>
+    return <Navigate to="/login" />;
   }
 
   if (isValidating) {

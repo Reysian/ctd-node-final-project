@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Transaction = require("../models/Transaction");
+const CustomError = require("../errors/custom-error")
 
 const getAllTransactions = async (req, res) => {
   const transactions = await Transaction.find({
@@ -11,7 +12,7 @@ const getAllTransactions = async (req, res) => {
 const getUserInfo = async (req, res) => {
   const user = await User.findOne({_id: req.user.userID});
   if (!user) {
-    throw new Error(`No user with id=${req.params.id}`);
+    throw new CustomError(400, `No user with id=${req.params.id}`);
   }
   res.status(200).json({ user });
 }
@@ -24,7 +25,7 @@ const getTransaction = async (req, res) => {
     createdBy: userID,
   });
   if (!transaction) {
-    throw new Error(`No transaction with id=${tID} from user=${name} found`);
+    throw new CustomError(400, `No transaction with id=${tID} from user=${name} found`);
   }
   res.status(200).json({ transaction });
 };
@@ -38,7 +39,7 @@ const createTransaction = async (req, res) => {
   // Get recipient's user ID if recipient email is included
   if (typeOf === "transfer") {
     if (!recipient_email) {
-      throw Error("Transfer requires recipient email");
+      throw new CustomError(400, "Transfer requires recipient email");
     }
     const recipientObject = await User.findOne({
       email: req.body.recipient_email,
@@ -47,7 +48,7 @@ const createTransaction = async (req, res) => {
       recipient = recipientObject._id;
       recipientEmail = recipientObject.email;
     } else {
-      throw Error("Recipient email invalid");
+      throw new CustomError(401, "Recipient email invalid");
     }
   }
 
@@ -73,7 +74,7 @@ const editTransaction = async (req, res) => {
   // Get recipient's user ID if recipient email is included
   if (typeOf === "transfer") {
     if (!recipient_email) {
-      throw Error("Transfer requires recipient email");
+      throw new CustomError(400, "Transfer requires recipient email");
     }
     const recipientObject = await User.findOne({
       email: recipient_email,
@@ -82,7 +83,7 @@ const editTransaction = async (req, res) => {
       recipient = recipientObject._id;
       recipientEmail = recipientObject.email;
     } else {
-      throw Error("Recipient email invalid");
+      throw new CustomError(401, "Recipient email invalid");
     }
   }
 
@@ -103,7 +104,7 @@ const editTransaction = async (req, res) => {
   );
 
   if (!transaction) {
-    throw new Error(`No transaction with id=${tID} from user=${name} found`);
+    throw new CustomError(400, `No transaction with id=${tID} from user=${name} found`);
   }
 
   res.status(201).json({ transaction });
@@ -118,7 +119,7 @@ const deleteTransaction = async (req, res) => {
     createdBy: userID,
   });
   if (!transaction) {
-    throw new Error(`No transaction with id=${tID} from user=${name} found`);
+    throw new CustomError(400, `No transaction with id=${tID} from user=${name} found`);
   }
   res.status(201).json({ transaction });
 };
@@ -133,13 +134,13 @@ const submitTransaction = async (req, res) => {
     { new: true, runValidators: true },
   );
   if (!transaction) {
-    throw new Error(`No transaction with id=${tID} from user=${name} found`);
+    throw new CustomError(400, `No transaction with id=${tID} from user=${name} found`);
   }
 
   let user = await User.findOne({ _id: userID });
 
   if (!user) {
-    throw new Error(`User not found`);
+    throw new CustomError(400, `User not found`);
   }
 
   // Apply transaction to user account
@@ -159,7 +160,7 @@ const submitTransaction = async (req, res) => {
         { _id: tID, createdBy: userID },
         { submitted: false },
       );
-      throw new Error(`Overdraft: Transaction declined`);
+      throw new CustomError(403, `Overdraft: Transaction declined`);
     }
 
     // Withdraw funds from user balance
@@ -176,7 +177,7 @@ const submitTransaction = async (req, res) => {
         { _id: tID, createdBy: userID },
         { submitted: false },
       );
-      throw new Error(`Overdraft: Transaction declined`);
+      throw new CustomError(403, `Overdraft: Transaction declined`);
     }
 
     // Withdraw funds from user balance
